@@ -1,0 +1,62 @@
+services:
+  parser:
+    image: parser
+    build: .
+
+    ports:
+      - 8080:8080
+    networks:
+      - moripie
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    shm_size: 128mb
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+    ports:
+      - 5432:5432
+    networks:
+      - moripie
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  valkey:
+    image: valkey/valkey:latest
+    volumes:
+      - valkey_data:/data
+
+    ports:
+      - 6379:6379
+    networks:
+      - moripie
+    
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  valkey_data:
+
+networks:
+  moripie:

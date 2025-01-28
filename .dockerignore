@@ -1,0 +1,5 @@
+.venv
+example.env
+*.pyc
+.gitignore
+*.md
