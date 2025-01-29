@@ -21,7 +21,15 @@ async def lifespan(app: FastAPI):
 
 app: FastAPI = FastAPI(lifespan = lifespan, default_response_class = ORJSONResponse)
 
-@app.get("/")
-async def Test(session: SessionDepend):
-    Query: Select = select(TranslationItem).order_by(TranslationItem.mal_id)
+
+@app.get("/anime/{mal_id}", description = "Get translations by MAL ID")
+async def Test(session: SessionDepend, mal_id: int):
+    Query: Select = select(TranslationItem).where(TranslationItem.mal_id == mal_id).order_by(TranslationItem.dub_team)
+    return { "data": (await session.scalars(Query)).all() }
+
+@app.get("/team/{dub_team}", description = "Get translations by dubbing team")
+async def Test(session: SessionDepend, dub_team: str, limit: int | None = None, page: int | None = None):
+    Query: Select = select(TranslationItem).where(TranslationItem.dub_team == dub_team) \
+                    .limit(max(5, min(limit, 20))).offset(page).order_by(TranslationItem.mal_id)
+
     return { "data": (await session.scalars(Query)).all() }

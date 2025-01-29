@@ -13,6 +13,8 @@ docker build -t parser .
 docker compose up
 ```
 
+# Usage
+http://localhost:8080/docs
 
 # Structure
 ```bash

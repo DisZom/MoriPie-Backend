@@ -12,7 +12,6 @@ from fastapi import Depends
 
 class DBHelper:
     def __init__(self) -> None:
-        print(Config.DB_URI)
         self.__engine: AsyncEngine = create_async_engine(Config.DB_URI)
         self.__maker: async_sessionmaker[AsyncSession] = async_sessionmaker(self.__engine)
 
@@ -35,7 +34,8 @@ class DBHelper:
             await Session.close()
 
     async def SessionDep(self) -> AsyncGenerator[AsyncSession, None]:
-        yield await self.GetSession()
+        async with self.GetSession() as Session:
+            yield Session
 
 
 Helper: DBHelper = DBHelper()
