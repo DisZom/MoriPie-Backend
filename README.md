@@ -3,7 +3,7 @@ Parser for automatic collection animes from the websites of dubbing teams (AniFi
 
 # Building
 ```bash
-cp .env.example .env
+cp example.env .env
 # fill values in .env 
 docker build -t parser .
 ```
